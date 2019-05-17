@@ -7,6 +7,10 @@
 
 #neuralnet().fit({"input":image_input},{"targets":y},validation_set=(image_test,text_y),show_metric=True,n_epoch=10,shuffle=True,
 #                run_id="test",snapshot_step=500)
+import cv2
+import csv
+
+
 
 def process_data():
     import tflearn
@@ -129,4 +133,4 @@ def bitcoin():
 #        model.fit(np.array(new_trainx)[i], np.array(new_trainy)[i], validation_set=(np.array(new_testx)[i], np.array(new_testy)[i]), show_metric=True,batch_size=100)
     model.fit(np.array(trainX), np.array(trainY), validation_set=(np.array(testX), np.array(testY)), show_metric=True,batch_size=100)
 
-bitcoin()
+#bitcoin()
