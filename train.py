@@ -11,6 +11,8 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 import torch
+import matplotlib.pyplot as plt
+
 import torch.nn as nn
 
 def process_data():
@@ -75,7 +77,6 @@ def process_data():
         for i in range(0, len(l), n):
             yield l[i:i + n]
 def bitcoin():
-    import matplotlib.pyplot as plt
 
 
 
@@ -115,7 +116,6 @@ def bitcoin():
 
 
 def process():
-    import matplotlib.pyplot as plt
     ## loads data and sorts
     data = pandas.read_csv("bitcoin-historical-data/bitstampUSD_1-min_data_2012-01-01_to_2019-08-12.csv")
     df = pandas.DataFrame(data)
