@@ -3,7 +3,15 @@
 import csv
 
 import pandas
+import numpy as np
+from keras.engine.saving import load_model, model_from_json
+from sklearn.preprocessing import MinMaxScaler
 
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+import torch
+import torch.nn as nn
 
 def process_data():
     import tflearn
@@ -67,15 +75,8 @@ def process_data():
         for i in range(0, len(l), n):
             yield l[i:i + n]
 def bitcoin():
-    import pandas
-    import numpy as np
-    from sklearn.preprocessing import MinMaxScaler
+    import matplotlib.pyplot as plt
 
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras.layers import LSTM
-    import torch
-    import torch.nn as nn
 
 
 
@@ -85,35 +86,71 @@ def bitcoin():
     group=df.groupby("date")
     sorted_price=group["Weighted_Price"].mean()
     days=30
+    scaler=MinMaxScaler()
     train=sorted_price[:len(sorted_price)-days]
-    test=sorted_price[len(sorted_price)-days:]
     training_set=train.values
     training_set=np.reshape(training_set,(len(training_set),1))
 
 
-    training_set=MinMaxScaler().fit_transform(training_set)
+    training_set=scaler.fit_transform(training_set)
+    ## reshapes the input into [data size,1,1]
     X_train = training_set[0:len(training_set) - 1]
     y_train = torch.from_numpy(np.array(training_set[1:len(training_set)]))
     X_train = torch.from_numpy(np.reshape(X_train, (len(X_train), 1, 1)))
-    print(X_train.shape)
 
-
+    ## trains model
 
     regressor = Sequential()
 
     regressor.add(LSTM(units=4, activation='sigmoid', input_shape=(None, 1)))
     regressor.add(Dense(units=1))
-    regressor.compile(optimizer='adam', loss='mean_squared_error')
-    regressor.fit(X_train, y_train, batch_size=5, epochs=100)
+    regressor.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
+    regressor.fit(X_train, y_train, batch_size=5, epochs=200)
+    # serialize model to JSON
+
+    regressor.save("model.h5")
+
+    print("Saved model to disk")
+
+
+
+def process():
+    import matplotlib.pyplot as plt
+    ## loads data and sorts
+    data = pandas.read_csv("bitcoin-historical-data/bitstampUSD_1-min_data_2012-01-01_to_2019-08-12.csv")
+    df = pandas.DataFrame(data)
+    df["date"] = pandas.to_datetime(df["Timestamp"], unit="s").dt.date
+    group = df.groupby("date")
+    sorted_price = group["Weighted_Price"].mean()
+    days = 30
+    ## normalizes data with min max transform
+    scaler = MinMaxScaler()
+    train = sorted_price[:len(sorted_price) - days]
+    test = sorted_price[len(sorted_price) - days:]
+    training_set = train.values
+    training_set = np.reshape(training_set, (len(training_set), 1))
+    training_set=scaler.fit_transform(training_set)
+    model=load_model("model.h5")
     test_set = test.values
-    inputs = np.reshape(test_set, (len(test_set), 1))
-    inputs = MinMaxScaler().transform(inputs)
-    inputs = np.reshape(inputs, (len(inputs), 1, 1))
-    predicttion=regressor.predict(inputs)
-    inverset=MinMaxScaler().inverse_transform(X=predicttion)
-    print(inverset)
+    test_set = np.reshape(test_set, (len(test_set), 1))
+    test_set = scaler.transform(test_set)
+    test_set = np.reshape(test_set, (len(test_set), 1, 1))
+    ## gets prediction using test data
+    prediction = model.predict(test_set)
+    predicted_price = scaler.inverse_transform(prediction)
+    print(predicted_price)
 
+    ## displays data onto matplot
+    plt.figure(figsize=(25,15),dpi=90,)
+    plt.plot(test_set,color="red",label="real")
+    plt.plot(predicted_price,color="blue",label="predicted")
+    test=test.reset_index()
+    x=test.index
+    labels=test["date"]
+    plt.xticks(x,labels,rotation="vertical")
 
-
-
-bitcoin()
+    plt.xlabel('time', fontsize=40)
+    plt.ylabel('btc price', fontsize=40)
+    plt.legend(loc=2, prop={'size': 25})
+    plt.show()
+process()
