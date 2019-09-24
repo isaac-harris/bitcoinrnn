@@ -2,6 +2,7 @@
 
 import csv
 
+import pandas
 
 
 def process_data():
@@ -104,6 +105,15 @@ def bitcoin():
     regressor.add(Dense(units=1))
     regressor.compile(optimizer='adam', loss='mean_squared_error')
     regressor.fit(X_train, y_train, batch_size=5, epochs=100)
-    print(regressor.outputs)
+    test_set = test.values
+    inputs = np.reshape(test_set, (len(test_set), 1))
+    inputs = MinMaxScaler().transform(inputs)
+    inputs = np.reshape(inputs, (len(inputs), 1, 1))
+    predicttion=regressor.predict(inputs)
+    inverset=MinMaxScaler().inverse_transform(X=predicttion)
+    print(inverset)
+
+
+
 
 bitcoin()
