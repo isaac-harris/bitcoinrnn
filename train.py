@@ -137,9 +137,10 @@ def process():
     test_set = np.reshape(test_set, (len(test_set), 1, 1))
     ## gets prediction using test data
     prediction = model.predict(test_set)
-    predicted_price = scaler.inverse_transform(prediction)
-    print(predicted_price)
-
+    predicted_price = np.array(scaler.inverse_transform(prediction))
+    test_set=test_set.reshape([30,1])
+    test_set=scaler.inverse_transform(test_set)
+    print(test_set,predicted_price)
     ## displays data onto matplot
     plt.figure(figsize=(25,15),dpi=90,)
     plt.plot(test_set,color="red",label="real")
@@ -153,4 +154,65 @@ def process():
     plt.ylabel('btc price', fontsize=40)
     plt.legend(loc=2, prop={'size': 25})
     plt.show()
-process()
+# process()
+def badclass():
+    class enemy:
+        def __init__(self):
+            self.weps=100
+            self.health=50
+
+    def sleep(object):
+        object.health+=1
+
+    enemy1=enemy()
+    enemy1.health=100
+    enemy1.weps=50
+    print(" first enemy has health {}".format(enemy1.health))
+
+    human=enemy()
+    enemy1.health=50
+
+    print(human.health)
+    while human.health>0:
+        dmga=int(input(print("enter dmg amount")))
+        human.health-=dmga
+        print(human.health)
+
+    class enem(enemy):
+        def __init__(self):
+            super().__init__()
+        def count_Wep(self):
+            print(self.weps)
+    class enem2(enemy):
+        pass
+    enemy2=enem()
+
+    enemy2.weps=0
+    enemy2.count_Wep()
+
+#
+# import scipy as sc
+# print(sc.fft._backend.ua)
+# while True:
+#     mat=np.array(np.random.rand(10,10)).transpose()
+#     import scipy.fft as sf
+#     print(np.array(sf.fft(mat)).cumprod())
+
+import cv2
+import matplotlib as mpl
+mpl.use("WXAgg")
+import matplotlib.pyplot as plt
+import matplotlib.rcsetup as rcsetup
+print(cv2.__version__)
+from matplotlib.ticker import StrMethodFormatter
+df2=pandas.read_csv("bitcoin-historical-data/bitstampUSD_1-min_data_2012-01-01_to_2019-08-12.csv")
+df=pandas.read_csv("/home/danhyal/knifecrime2.csv")
+print(df.keys())
+print(rcsetup.all_backends)
+print(plt.get_backend())
+ax = df.plot()
+plt.show()
+import sqlite3
+# conn=sqlite3.connect("/home/danhyal/database.laccdb")
+# c=conn.cursor()
+# print(c.execute("SELECT *"))
