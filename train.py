@@ -197,14 +197,24 @@ def badclass():
 #     mat=np.array(np.random.rand(10,10)).transpose()
 #     import scipy.fft as sf
 #     print(np.array(sf.fft(mat)).cumprod())
+from cv2 import cv2
 
-import cv2
+# this is just to unconfuse pycharm
+try:
+    from cv2 import cv2
+except ImportError:
+    pass
+print(cv2)
 import matplotlib as mpl
+import opencv_wrapper.display
 mpl.use("WXAgg")
 import matplotlib.pyplot as plt
+print()
 import matplotlib.rcsetup as rcsetup
-print(cv2.__version__)
 from matplotlib.ticker import StrMethodFormatter
+img=cv2.imread("/home/danhyal/test.jpg")
+opencv_wrapper.display.line(img,(1,2),color=2,point2=(2,1))
+print(img)
 df2=pandas.read_csv("bitcoin-historical-data/bitstampUSD_1-min_data_2012-01-01_to_2019-08-12.csv")
 df=pandas.read_csv("/home/danhyal/knifecrime2.csv")
 print(df.keys())
